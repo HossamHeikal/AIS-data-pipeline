@@ -1,0 +1,104 @@
+version: "3"
+
+services:
+  namenode:
+    image: apache/hadoop:3
+    hostname: namenode
+    command: ["sh", "-c", "hdfs namenode & sleep 10 && hdfs dfs -chmod -R 777 / && tail -f /dev/null"]
+    ports:
+      - 9870:9870
+    env_file:
+      - ./config
+    environment:
+        ENSURE_NAMENODE_DIR: "/tmp/hadoop-hadoop/dfs/name"
+        HADOOP_HOME: /opt/hadoop
+
+  datanode:
+    image: apache/hadoop:3
+    command: ["hdfs", "datanode"]
+    env_file:
+      - ./config
+    environment:
+      HADOOP_HOME: /opt/hadoop
+  
+  spark-master:
+    image: my-spark-image
+    container_name: spark-master
+    ports:
+      - "8080:8080"   # Spark Master WebUI
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - PYSPARK_PYTHON=python3.9
+      - PYSPARK_DRIVER_PYTHON=python3.9
+
+  spark-worker:
+    image: my-spark-image
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=2
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - PYSPARK_PYTHON=python3.9
+      - PYSPARK_DRIVER_PYTHON=python3.9
+  
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 2181:2181
+      - 2888:2888
+      - 3888:3888
+
+ # kafka multi node     
+  kafka1:
+    image: wurstmeister/kafka:latest
+    restart: "no"
+    links:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL://:29092,EXTERNAL://:29093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:29092,EXTERNAL://localhost:29093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    ports:
+      - "3000:3000"
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: mydatabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: user
+      MB_DB_PASS: password
+      MB_DB_HOST: postgres
+
+volumes:
+  postgres-data:
