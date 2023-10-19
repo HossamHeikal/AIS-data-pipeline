@@ -5,6 +5,17 @@ End-to-End Automated Data Pipeline: From Data Acquisition to Visualization with 
 **Objective**:
 Build a system that automates data download, processes it, and prepares it for visualization.
 
+**Project Context**:
+The data engineering project extracts AIS data for analysis, helping in visualizing ship movements and related insights.
+
+**AIS Data**
+
+**AIS (Automatic Identification System)** is a navigation safety system used by ships and maritime authorities. It electronically shares vessel details, such as:
+
+1. **Identification**: Unique vessel ID, call sign, and name.
+2. **Location**: Current position, course, and speed.
+3. **Vessel Details**: Type (e.g., cargo, tanker), destination, estimated arrival time, and more.
+   
 **Components**:
 1. **Docker**: Ensures our setup works uniformly across different environments.
 2. **Apache Spark**: Handles large-scale data processing.
