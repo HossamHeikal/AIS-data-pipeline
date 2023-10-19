@@ -27,7 +27,7 @@ Build a system that automates data download, processes it, and prepares it for v
    - Use Airflow to schedule daily data downloads and processing between specific dates.
    
 4. **Data Transformation**:
-   - Read the stored data, clean it, and gather insights on popular destinations.
+   - Read the stored data, clean it, and make a popular destination analysis for the ship.
    
 **Outcome**:
 The system will automatically gather, process, and store data daily, making it ready for visual analysis.
