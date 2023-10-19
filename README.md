@@ -1,6 +1,7 @@
 # AIS-data-pipeline
 End-to-End Automated Data Pipeline: From Data Acquisition to Visualization with Dockerized Spark, Kafka, HDFS, and Airflow
-**Data Engineering Project Overview**
+
+**Project Overview**
 
 **Objective**:
 Build a system that automates data download, processes it, and prepares it for visualization.
